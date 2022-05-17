@@ -28,6 +28,5 @@ export const isMinedUncleBlock = async (chain: Chain, blockHeight: number, block
     for (let i = 0; i < block.uncles.length; i++) {
         isUncle = await getUncle(chain, blockHeight, i, blockhash || checksumCoinbaseAddr);
     }
-
     return await isUncle;
 };
