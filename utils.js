@@ -44,7 +44,9 @@ var Chain;
 })(Chain || (Chain = {}));
 var web3 = new Web3('http://localhost:8545');
 var isMinedUncleBlock = function (chain, blockHeight, blockhash, coinbaseAddr) { return __awaiter(_this, void 0, void 0, function () {
+    var checksumCoinbaseAddr;
     return __generator(this, function (_a) {
+        checksumCoinbaseAddr = web3.utils.toChecksumAddress(coinbaseAddr);
         return [2 /*return*/, web3.eth.getBlock(blockHeight)
                 .then(function (block) {
                 if (!block)
@@ -54,7 +56,7 @@ var isMinedUncleBlock = function (chain, blockHeight, blockhash, coinbaseAddr) {
                 .then(function (block) {
                 if (blockhash && block.hash === blockhash)
                     return false; // if the block at this height and the block hash match, not an uncle
-                if (coinbaseAddr && block.miner === coinbaseAddr)
+                if (coinbaseAddr && block.miner === checksumCoinbaseAddr)
                     return false;
                 if (block.uncles.length > 0)
                     return true;
@@ -62,5 +64,5 @@ var isMinedUncleBlock = function (chain, blockHeight, blockhash, coinbaseAddr) {
             })];
     });
 }); };
-isMinedUncleBlock(Chain.ETH, 14792407, null, '0x00192Fb10dF37c9FB26829eb2CC623cd1BF599E8')
+isMinedUncleBlock(Chain.ETH, 14792407, null, '0x00192fb10dF37c9FB26829eb2CC623cd1BF599E8')
     .then(console.log)["catch"](function (err) { return console.log("".concat(err)); });
