@@ -3,13 +3,13 @@ const Web3 = require('web3'); // necessary for Node.js
 const cliArgs = process.argv.slice(2);
 const provider = cliArgs[0];
 
-enum Chain {
+export enum Chain {
     ETH,
 }
 
 const web3 = new Web3('http://localhost:8545');
 
-const isMinedUncleBlock = async (chain: Chain, blockHeight: number, blockhash?: string, coinbaseAddr?: string): Promise<boolean> => {
+export const isMinedUncleBlock = async (chain: Chain, blockHeight: number, blockhash?: string, coinbaseAddr?: string): Promise<boolean> => {
     const checksumCoinbaseAddr = web3.utils.toChecksumAddress(coinbaseAddr);
     return web3.eth.getBlock(blockHeight)
         .then(block => {
@@ -23,7 +23,3 @@ const isMinedUncleBlock = async (chain: Chain, blockHeight: number, blockhash?: 
             throw new Error(`${chain} at block height ${blockHeight} with hash ${blockhash} does not exist`);
         });
 };
-
-isMinedUncleBlock(Chain.ETH, 14792407, undefined, '0x00192fb10dF37c9FB26829eb2CC623cd1BF599E8')
-    .then(console.log)
-    .catch(err => console.log(`${err}`));
