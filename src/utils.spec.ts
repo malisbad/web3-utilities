@@ -22,8 +22,13 @@ describe('isMinedUncleBlock', () => {
         await expect(isUncle).toBe(false);
     });
 
-    test('Checks correctly against a block where blockhash is an uncle', async () => {
+    test('Checks correctly against a block where blockhash is an uncle, by blockhash', async () => {
         const isUncle = await isMinedUncleBlock(Chain.ETH, 14792407, '0xcfc079eeda235019debe19a8e7035924989e22436235bb0f828df884644108ca');
+        await expect(isUncle).toBe(true);
+    });
+
+    test('Checks correctly against a block with uncles, in nth position, by blockhash', async ()  => {
+        const isUncle = await isMinedUncleBlock(Chain.ETH, 14792921, '0xa1b505e34ae3ce8f1e5c411dee199c60f4863b069684459bc190774b823b82cc');
         await expect(isUncle).toBe(true);
     });
 });
