@@ -56,4 +56,18 @@ describe('isMinedUncleBlock, ETH', () => {
             .rejects
             .toThrowError(`${chain} at ${blockHeight} does not match and there are no uncles`);
     });
+
+    test('Fails correctly against a block with uncles by miner', async ()  => {
+        const blockHeight = 14793642;
+        await expect(isMinedUncleBlock(chain, blockHeight, undefined, '0x8b4de256180cfec54c436a470af50f9ee2813dbb'))
+            .rejects
+            .toThrowError(`${chain} at ${blockHeight} is possibly orphaned`);
+    });
+
+    test('Fails correctly against a block with uncles by blockhash', async ()  => {
+        const blockHeight = 14793642;
+        await expect(isMinedUncleBlock(chain, blockHeight, '0xa1b505e34ae3ce8f1e5c411dee199c60f4863b069684459bc190774b823b82cc'))
+            .rejects
+            .toThrowError(`${chain} at ${blockHeight} is possibly orphaned`);
+    });
 });
