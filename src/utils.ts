@@ -11,6 +11,7 @@ const web3 = new Web3('http://localhost:8545');
 
 export const isMinedUncleBlock = async (chain: Chain, blockHeight: number, blockhash?: string, coinbaseAddr?: string): Promise<boolean> => {
     const checksumCoinbaseAddr = web3.utils.toChecksumAddress(coinbaseAddr);
+
     return web3.eth.getBlock(blockHeight)
         .then(block => {
             if (!block) throw new Error(`${chain} at block height ${blockHeight} does not exist`)
