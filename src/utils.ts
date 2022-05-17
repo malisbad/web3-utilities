@@ -24,6 +24,6 @@ const isMinedUncleBlock = async (chain: Chain, blockHeight: number, blockhash?: 
         });
 };
 
-isMinedUncleBlock(Chain.ETH, 14792407, null, '0x00192fb10dF37c9FB26829eb2CC623cd1BF599E8')
+isMinedUncleBlock(Chain.ETH, 14792407, undefined, '0x00192fb10dF37c9FB26829eb2CC623cd1BF599E8')
     .then(console.log)
     .catch(err => console.log(`${err}`));
