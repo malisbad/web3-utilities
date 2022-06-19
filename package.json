@@ -8,10 +8,12 @@
   "scripts": {
     "test": "npx jest",
     "test:watch": "npx jest --watch",
+    "test:remote": "npx jest --config=./jest.remote.config.js",
     "watch": "parcel watch",
     "build": "parcel build"
   },
   "dependencies": {
+    "bn.js": "^5.2.1",
     "web3": "^1.7.3"
   },
   "devDependencies": {

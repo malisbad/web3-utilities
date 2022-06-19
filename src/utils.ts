@@ -1,15 +1,16 @@
 const Web3 = require('web3'); // necessary for Node.js
 
 import BN from "bn.js";
+import { Console } from "console";
 
 const cliArgs = process.argv.slice(2);
-const provider = cliArgs[0];
+const provider = cliArgs[0] || 'http://localhost:8545';
 
 export enum Chain {
     ETH = 'ETH',
 }
 
-const web3 = new Web3('http://localhost:8545' || provider);
+let web3 = new Web3(provider);
 
 const getUncle = async (chain: Chain, blockHeight: number, idx: number, hash: string) => {
     const block = await web3.eth.getUncle(blockHeight, idx);
@@ -49,19 +50,27 @@ export const calculateBlockReward = async (blockHeight: number) => {
     const baseGasFee = new BN(block.baseFeePerGas);
     const burnedFee = gasUsed.mul(baseGasFee);
 
-    // TODO this method is slow AF (39s in testing M1 Mac Mini), needs improvement
-    let totalFees = new BN(0);
+    let transactionReceipts: Promise<any>[] = [];
     for (let i = 0; i < block.transactions.length; i++) {
-        const txDetails = await getTransactionReceipt(block.transactions[i]);
-        const gasUsed = new BN(txDetails.gasUsed);
-        const gasPrice = new BN(txDetails.effectiveGasPrice);
-        totalFees = totalFees.add(gasUsed.mul(gasPrice));
+        transactionReceipts.push(web3.eth.getTransactionReceipt(block.transactions[i]));
     };
-
-    return baseReward.add(await totalFees).sub(burnedFee);
+    
+    // get all of the receipts FIRST, then process otherwise it is too slow
+    return Promise.all(transactionReceipts)
+        .then(receipts => {
+            // can't declare this in the initil value arg as it will always rest to zero
+            let accumulator = new BN(0); 
+            return receipts.reduce((acc, receipt) => {
+                const gasUsed = new BN(receipt.gasUsed);
+                const gasPrice = new BN(receipt.effectiveGasPrice);
+                const total = gasUsed.mul(gasPrice)
+                return acc.add(total);
+                }, accumulator
+            )
+        })
+        .then(transactionRewards => baseReward.add(transactionRewards).sub(burnedFee))
 }
 
 // TODO calculate blockrewards for normal blocks between two dates
 
 // TODO calculate blockrewards for uncle blocks between two dates
-
