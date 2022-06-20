@@ -48,6 +48,7 @@ export const calculateBlockReward = async (blockHeight: number) => {
     const baseReward = web3.utils.toWei(new BN(2), 'ether');
     const gasUsed = new BN(block.gasUsed);
     const baseGasFee = new BN(block.baseFeePerGas);
+    const uncleInclusionRewards = new BN(web3.utils.toWei("0.0625", 'ether')).mul(new BN(block.uncles.length));
     const burnedFee = gasUsed.mul(baseGasFee);
 
     let transactionReceipts: Promise<any>[] = [];
@@ -68,7 +69,7 @@ export const calculateBlockReward = async (blockHeight: number) => {
                 }, accumulator
             )
         })
-        .then(transactionRewards => baseReward.add(transactionRewards).sub(burnedFee))
+        .then(transactionRewards => baseReward.add(transactionRewards).add(uncleInclusionRewards).sub(burnedFee))
 }
 
 // TODO calculate blockrewards for normal blocks between two dates
