@@ -17,11 +17,6 @@ const getUncle = async (chain: Chain, blockHeight: number, idx: number, hash: st
     return hash === block.hash || hash === block.miner;
 };
 
-const getTransactionReceipt = async (txHash: number) => {
-    const tx = await web3.eth.getTransactionReceipt(txHash);
-    return tx;
-};
-
 export const isMinedUncleBlock = async (chain: Chain, blockHeight: number, blockhash?: string, coinbaseAddr?: string): Promise<boolean | Error> => {
     const checksumCoinbaseAddr = web3.utils.toChecksumAddress(coinbaseAddr);
     const block = await web3.eth.getBlock(blockHeight);
