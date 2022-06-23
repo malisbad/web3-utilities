@@ -38,8 +38,8 @@ export const isMinedUncleBlock = async (chain: Chain, blockHeight: number, block
     };
 };
 
-export const calculateBlockReward = async (blockHeight: number) => {
-    const block = await web3.eth.getBlock(blockHeight);
+export const calculateBlockReward = async (blockHeight?: number, blockInput?: any): Promise<BN> => {
+    const block = blockInput || await web3.eth.getBlock(blockHeight);
     const baseReward = web3.utils.toWei(new BN(2), 'ether');
     const gasUsed = new BN(block.gasUsed);
     const baseGasFee = new BN(block.baseFeePerGas);
@@ -67,6 +67,71 @@ export const calculateBlockReward = async (blockHeight: number) => {
         .then(transactionRewards => baseReward.add(transactionRewards).add(uncleInclusionRewards).sub(burnedFee))
 }
 
+export const calculateUncleBlockReward = async (includedInBlock: number, uncleIndex: number) => {
+    const block = await (web3.eth.getUncle(includedInBlock, uncleIndex));
+    const reward = (block.number + 8 - includedInBlock) * (2 / 8);
+    return web3.utils.toWei(new BN(reward), 'ether');
+}
+
+type BlockRange = {
+    earliest?: number;
+    latest?: number;
+}
+
 // TODO calculate blockrewards for normal blocks between two dates
+export const blocksByRange = async ({earliest, latest}: BlockRange) => {
+    const latestBlock = await web3.eth.getBlock("latest");
+    const lastBlock = latest ? latest : latestBlock.number;
+    if(!earliest) earliest = latestBlock - 10000;
+    
+    const blocks: Promise<any>[] = [];
+    for (let i = earliest; i <= lastBlock; i++) {
+        blocks.push(web3.eth.getBlock(i));
+    };
+
+    return Promise.all(blocks);
+}
+
+export const blockRewardsByRange = async ({earliest, latest}: BlockRange) => {
+    let blockRewards: Promise<any>[] = [];
+    let uncleRewards: Promise<any>[] = [];
+
+    const blocks = await blocksByRange({ earliest, latest });
+
+    for (let i = 0; i < blocks.length; i++) {
+        const currentBlock = blocks[i];
+        blockRewards.push(calculateBlockReward(undefined, currentBlock));
+        if (currentBlock.uncles.length > 0) {
+            for (let j = 0; j < currentBlock.uncles.length; j++) {
+                const uncle = calculateUncleBlockReward(currentBlock.uncles[j], j);
+                uncleRewards.push(uncle);
+            }
+        }
+    }
+
+    return {
+        blockRewards,
+        uncleRewards
+    }
+}
+
+export const batchBlockRewardsByRange = async ({earliest, latest}: BlockRange) => {
+    const latestBlock = await web3.eth.getBlock("latest");
+    const lastBlock = latest ? latest : latestBlock.number;
+    if(!earliest) earliest = latestBlock - 10000;
+    
+    let batch = new web3.BatchRequest();
+    for (let i = earliest; i <= lastBlock; i++) {
+        batch.add(web3.eth.getBlock.request(i));
+    };
+
+    return batch.execute();
+
+    // return Promise.all(blocks);
+}
 
 // TODO calculate blockrewards for uncle blocks between two dates
+
+blockRewardsByRange({latest: 15005566, earliest: 15005565})
+    .then(blocks => console.log(blocks))
+    .catch(err => console.log(err));
