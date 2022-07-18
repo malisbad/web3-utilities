@@ -1,7 +1,6 @@
 const Web3 = require('web3'); // necessary for Node.js
 
 import BN from "bn.js";
-import { Console } from "console";
 
 const cliArgs = process.argv.slice(2);
 const provider = cliArgs[0] || 'http://localhost:8545';
