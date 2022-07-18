@@ -1,3 +1,9 @@
+/**
+ * Some of the tests in this suite are disabled by default because
+ * they are very heavy to run, and if you test these against a light
+ * node, or a full node that you don't have an arrangement with, you 
+ * can end up with your node getting kicked off the network.
+ */
 import BN from 'bn.js';
 import { Chain, calculateBlockReward } from './utils';
 
