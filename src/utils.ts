@@ -115,6 +115,13 @@ export const blockRewardsByRange = async ({earliest, latest}: BlockRange) => {
     }
 }
 
+/**
+ * Currently one of the slowest ways to batch out requests, but doesn it in a way
+ * that will not produce warnings from Geth. Geth will start to output warnings
+ * when there are 100 or more concurrent requests in progress.
+ * @param param0
+ * @returns 
+ */
 export const batchBlockRewardsByRange = async ({earliest, latest}: BlockRange) => {
     const latestBlock = await web3.eth.getBlock("latest");
     const lastBlock = latest ? latest : latestBlock.number;
@@ -126,8 +133,6 @@ export const batchBlockRewardsByRange = async ({earliest, latest}: BlockRange) =
     };
 
     return batch.execute();
-
-    // return Promise.all(blocks);
 }
 
 // TODO calculate blockrewards for uncle blocks between two dates
