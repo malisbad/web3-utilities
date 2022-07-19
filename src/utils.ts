@@ -62,14 +62,14 @@ export const calculateBlockReward = async (blockHeight?: number, blockInput?: an
     return Promise.all(transactionReceipts)
         .then(receipts => {
             // can't declare this in the initil value arg as it will always rest to zero
-            let accumulator = new BN(0); 
-            return receipts.reduce((acc, receipt) => {
-                const gasUsed = new BN(receipt.gasUsed);
-                const gasPrice = new BN(receipt.effectiveGasPrice);
-                const total = gasUsed.mul(gasPrice)
-                return acc.add(total);
-                }, accumulator
-            )
+            let accumulator = new BN(0);
+                return receipts.reduce((acc, receipt) => {
+                    const gasUsed = new BN(receipt.gasUsed);
+                    const gasPrice = new BN(receipt.effectiveGasPrice);
+                    const total = gasUsed.mul(gasPrice)
+                    return acc.add(total);
+                    }, accumulator
+                )
         })
         .then(transactionRewards => baseReward.add(transactionRewards).add(uncleInclusionRewards).sub(burnedFee))
 }
@@ -85,7 +85,6 @@ type BlockRange = {
     latest?: number;
 }
 
-// TODO calculate blockrewards for normal blocks between two dates
 export const blocksByRange = async ({earliest, latest}: BlockRange) => {
     const latestBlock = await web3.eth.getBlock("latest");
     const lastBlock = latest ? latest : latestBlock.number;
@@ -143,11 +142,3 @@ export const batchBlockRewardsByRange = async ({earliest, latest}: BlockRange) =
 }
 
 // TODO calculate blockrewards for uncle blocks between two dates
-
-// blockRewardsByRange({latest: 15005566, earliest: 15005565})
-// blockRewardsByRange({latest: 15005547, earliest: 15005546})
-//     .then(blocks => {
-//         blocks.blockRewards.then(res => res.toString()).then(res => console.log('Block rewards: ', res));
-//         blocks.uncleRewards.then(res => res.toString()).then(res => console.log('Uncle rewards: ', res));
-//     })
-//     .catch(err => console.log(err));
