@@ -13,8 +13,8 @@ let web3 = new Web3('http://localhost:8545');
 
 const getBaseReward = (blockHeight: number) => {
     let baseReward = 0;
-    if (blockHeight <= 4369999) baseReward = 5
-    if (blockHeight >= 4370000 && blockHeight <= 7279999) baseReward = 3
+    if (blockHeight <= 4369999) baseReward = 5 // pre-Byzantium
+    if (blockHeight >= 4370000 && blockHeight <= 7279999) baseReward = 3 // pre-constantinople
     if (blockHeight >= 7280000) baseReward = 2
     return web3.utils.toWei(new BN(baseReward), 'ether');
 }
