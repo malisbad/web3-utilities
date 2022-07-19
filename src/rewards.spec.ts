@@ -29,8 +29,14 @@ describe.only('Block reward calculations', ()  => {
         expect(totalReward.eq(new BN("3039490300691388602"))).toBe(true);
     });
 
-    test('Calcualtes the correct pre-byzantine blockward', async () => {
+    test('Calcualtes the correct pre-byzantine blockward, early mining', async () => {
         const totalReward = await calculateBlockReward(450).then(res => {console.log(res.toString()); return res});
         expect(totalReward.eq(new BN("5000000000000000000"))).toBe(true);
+    });
+
+    // TODO this currently fails because of the way that transaction receipts are handled
+    test.skip('Calcualtes the correct pre-byzantine blockward, later mining', async () => {
+        const totalReward = await calculateBlockReward(4530000).then(res => {console.log(res.toString()); return res});
+        expect(totalReward.eq(new BN("3098266553451756196"))).toBe(true);
     });
 });
