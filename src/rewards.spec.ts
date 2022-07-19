@@ -5,11 +5,11 @@
  * can end up with your node getting kicked off the network.
  */
 import BN from 'bn.js';
-import { Chain, calculateBlockReward } from './utils';
+import { calculateBlockReward } from './utils';
 
 describe('Block reward calculations', ()  => {
     test('Calculates the correct post-London blockreward', async () => {
-        const totalReward = await calculateBlockReward(14811417);
+        const totalReward = await calculateBlockReward(14811417).then(res => {console.log(res.toString()); return res});
         expect(totalReward.eq(new BN("2029985731605798020"))).toBe(true);
     }, 350000);
 

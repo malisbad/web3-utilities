@@ -9,7 +9,15 @@ export enum Chain {
     ETH = 'ETH',
 }
 
-let web3 = new Web3(provider);
+let web3 = new Web3('http://localhost:8545');
+
+const getBaseReward = (blockHeight: number) => {
+    let baseReward = 0;
+    if (blockHeight <= 4369999) baseReward = 5
+    if (blockHeight >= 4370000 && blockHeight <= 7279999) baseReward = 3
+    if (blockHeight >= 7280000) baseReward = 2
+    return web3.utils.toWei(new BN(baseReward), 'ether');
+}
 
 const getUncle = async (chain: Chain, blockHeight: number, idx: number, hash: string) => {
     const block = await web3.eth.getUncle(blockHeight, idx);
@@ -39,7 +47,7 @@ export const isMinedUncleBlock = async (chain: Chain, blockHeight: number, block
 
 export const calculateBlockReward = async (blockHeight?: number, blockInput?: any): Promise<BN> => {
     const block = blockInput || await web3.eth.getBlock(blockHeight);
-    const baseReward = web3.utils.toWei(new BN(2), 'ether');
+    const baseReward = getBaseReward(blockHeight || blockInput.height);
     const gasUsed = new BN(block.gasUsed);
     const baseGasFee = new BN(block.baseFeePerGas);
     const uncleInclusionRewards = new BN(web3.utils.toWei("0.0625", 'ether')).mul(new BN(block.uncles.length));
@@ -66,10 +74,10 @@ export const calculateBlockReward = async (blockHeight?: number, blockInput?: an
         .then(transactionRewards => baseReward.add(transactionRewards).add(uncleInclusionRewards).sub(burnedFee))
 }
 
-export const calculateUncleBlockReward = async (includedInBlock: number, uncleIndex: number) => {
-    const block = await (web3.eth.getUncle(includedInBlock, uncleIndex));
-    const reward = (block.number + 8 - includedInBlock) * (2 / 8);
-    return web3.utils.toWei(new BN(reward), 'ether');
+export const calculateUncleBlockReward = async (includedInBlock, uncleIndex: number) => {
+    const block = await (web3.eth.getUncle(includedInBlock.hash, uncleIndex));
+    const reward = web3.utils.toWei(((block.number + 8 - includedInBlock.number) * (2 / 8)).toString());
+    return new BN(reward);
 }
 
 type BlockRange = {
@@ -102,15 +110,15 @@ export const blockRewardsByRange = async ({earliest, latest}: BlockRange) => {
         blockRewards.push(calculateBlockReward(undefined, currentBlock));
         if (currentBlock.uncles.length > 0) {
             for (let j = 0; j < currentBlock.uncles.length; j++) {
-                const uncle = calculateUncleBlockReward(currentBlock.uncles[j], j);
-                uncleRewards.push(uncle);
+                const uncleReward = calculateUncleBlockReward(currentBlock, j);
+                uncleRewards.push(uncleReward);
             }
         }
     }
 
     return {
-        blockRewards,
-        uncleRewards
+        blockRewards: Promise.all(blockRewards),
+        uncleRewards: Promise.all(uncleRewards)
     }
 }
 
@@ -136,6 +144,10 @@ export const batchBlockRewardsByRange = async ({earliest, latest}: BlockRange) =
 
 // TODO calculate blockrewards for uncle blocks between two dates
 
-blockRewardsByRange({latest: 15005566, earliest: 15005565})
-    .then(blocks => console.log(blocks))
-    .catch(err => console.log(err));
+// blockRewardsByRange({latest: 15005566, earliest: 15005565})
+// blockRewardsByRange({latest: 15005547, earliest: 15005546})
+//     .then(blocks => {
+//         blocks.blockRewards.then(res => res.toString()).then(res => console.log('Block rewards: ', res));
+//         blocks.uncleRewards.then(res => res.toString()).then(res => console.log('Uncle rewards: ', res));
+//     })
+//     .catch(err => console.log(err));
