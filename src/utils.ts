@@ -61,14 +61,12 @@ export const calculateBlockReward = async (blockHeight?: number, blockInput?: an
     // get all of the receipts FIRST, then process otherwise it is too slow
     return Promise.all(transactionReceipts)
         .then(receipts => {
-            // can't declare this in the initil value arg as it will always rest to zero
-            let accumulator = new BN(0);
                 return receipts.reduce((acc, receipt) => {
                     const gasUsed = new BN(receipt.gasUsed);
                     const gasPrice = new BN(receipt.effectiveGasPrice);
                     const total = gasUsed.mul(gasPrice)
-                    return acc.add(total);
-                    }, accumulator
+                    return acc.iadd(total);
+                    }, new BN(0)
                 )
         })
         .then(transactionRewards => baseReward.add(transactionRewards).add(uncleInclusionRewards).sub(burnedFee))
