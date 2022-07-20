@@ -99,8 +99,8 @@ export const blocksByRange = async ({earliest, latest}: BlockRange) => {
 }
 
 export const blockRewardsByRange = async ({earliest, latest}: BlockRange) => {
-    let blockRewards: Promise<any>[] = [];
-    let uncleRewards: Promise<any>[] = [];
+    let blockRewards: Promise<BN>[] = [];
+    let uncleRewards: Promise<BN>[] = [];
 
     const blocks = await blocksByRange({ earliest, latest });
 
