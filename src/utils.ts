@@ -12,6 +12,10 @@ export enum Chain {
 
 let web3 = new Web3(provider);
 
+export const subscribe = web3.eth.subcribe;
+
+export const unsubscribe = web3.eth.clearSubscriptions;
+
 const getUncle = async (chain: Chain, blockHeight: number, idx: number, hash: string) => {
     const block = await web3.eth.getUncle(blockHeight, idx);
     return hash === block.hash || hash === block.miner;
