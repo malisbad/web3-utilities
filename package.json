@@ -15,6 +15,9 @@
   "bugs": {
     "url": "https://github.com/malisbad/web3-utilities/issues"
   },
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "test": "npx jest",
     "test:watch": "npx jest --watch",
