@@ -1,7 +1,6 @@
 const Web3 = require('web3'); // necessary for Node.js
 
 import BN from "bn.js";
-import { Console } from "console";
 
 const cliArgs = process.argv.slice(2);
 const provider = cliArgs[0] || 'http://localhost:8545';
@@ -61,9 +60,9 @@ export const calculateBlockReward = async (blockHeight: number) => {
             // can't declare this in the initil value arg as it will always rest to zero
             let accumulator = new BN(0); 
             return receipts.reduce((acc, receipt) => {
-                const gasUsed = new BN(receipt.gasUsed);
+                const txGasUsed = new BN(receipt.gasUsed);
                 const gasPrice = new BN(receipt.effectiveGasPrice);
-                const total = gasUsed.mul(gasPrice)
+                const total = txGasUsed.mul(gasPrice)
                 return acc.add(total);
                 }, accumulator
             )
