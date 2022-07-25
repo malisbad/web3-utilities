@@ -5,6 +5,16 @@
   "main": "dist/main.js",
   "module": "dist/module.js",
   "types": "dist/types.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:malisbad/web3-utilities.git"
+  },
+  "keywords": ["web3", "geth", "eth mining", "block rewards", "eth rewards"],
+  "author": "Matt Williams",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/malisbad/web3-utilities/issues"
+  },
   "scripts": {
     "test": "npx jest",
     "test:watch": "npx jest --watch",
