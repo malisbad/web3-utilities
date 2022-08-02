@@ -12,9 +12,11 @@ export default class W3Utils {
     unsubscribe;
 
     constructor(provider: string) {
-        this.web3 = new Web3(provider);
+        this.web3 = new Web3();
         this.subscribe = this.web3.subscribe;
         this.unsubscribe = this.web3.unsubscribe;
+
+        this.web3.setProvider(new this.web3.providers.HttpProvider(provider));
     }
 
 
